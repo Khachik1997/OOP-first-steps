@@ -1,21 +1,22 @@
 <?php
-class Db
-{
-    private $conn;
-    private $whereStr ;
 
-    function __construct()
+
+class  Db extends mysqli
+{
+    private $whereStr ;
+    public function  __construct()
     {
-        $this->conn = new mysqli("localhost", "root", "", "oop_database");
-        if ($this->conn->connect_errno) {
-            echo "Failed to connect to MySQL: " . $this->conn->connect_error;
+
+        parent::__construct("localhost","root","","oop_database");
+        if (mysqli_connect_errno()) {
+            printf("Connect failed: %s\n", mysqli_connect_error());
             exit();
         }
     }
 
 
     public function where($column,$value,$oper = '='){
-        if(($this->whereStr)){
+        if($this->whereStr){
             $this->whereStr = $this->whereStr." AND $column $oper '$value' ";
         }else{
             $this->whereStr =" WHERE $column $oper '$value'";
@@ -23,7 +24,7 @@ class Db
         return $this;
     }
     public function orWhere($column,$value,$oper = '='){
-        if(($this->whereStr)){
+        if($this->whereStr){
             $this->whereStr = $this->whereStr." OR $column $oper '$value' ";
         }else{
             $this->whereStr =" WHERE $column $oper '$value'";
@@ -35,7 +36,7 @@ class Db
     public function select($sql)
     {
         $arrResult = [];
-        $result = $this->conn->query($sql);
+        $result = parent::query($sql);
         if($result->num_rows == 1){
             return $result->fetch_assoc();
         }else {
@@ -50,35 +51,35 @@ class Db
     {
         $dataVal = "";
         foreach ($data as $key => $value){
-            $dataVal.=  "'" .$this->conn->real_escape_string($value) . "',";
+            $dataVal.=  "'" .parent::real_escape_string($value) . "',";
         }
         $dataVal = substr($dataVal,0,-1);
-        $sql = "INSERT INTO $tbl_name (".implode(",",array_keys($data)) . ") VALUES ($dataVal)"  ;
-        return $this->conn->query($sql);
+
+        $sql = "INSERT INTO $tbl_name (".implode(",",array_keys($data)) . ") VALUES ($dataVal)";
+        return parent::query($sql);
     }
     public function update($table_name, $data)
     {
         $where_condition = $this->whereStr;
-        $this->whereStr = "";
+        $this->whereStr = null;
         $updateData="";
         foreach ($data as $key => $value){
             $updateData .=$key. "= '".$this->conn->real_escape_string($value) ."',";
         }
-        $updateData = substr($updateData,0,-2);
+        $updateData = substr($updateData,0,-1);
         $sql = "UPDATE  $table_name  SET   $updateData $where_condition";
-        return $this->conn->query($sql);
+        return parent::query($sql);
     }
 
     public function delete($table_name)
     {
         $where_condition = $this->whereStr;
-        $this->whereStr = "";
+        $this->whereStr = null;
         $sql = "DELETE FROM  $table_name   $where_condition";
-        return $this->conn->query($sql);
+        return parent::query($sql);
     }
 
 }
-
-
-$db = new Db;
-
+$obj = new Db;
+$result = $obj->select("SELECT * FROM user");
+var_dump($result);
