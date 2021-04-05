@@ -80,6 +80,3 @@ class  Db extends mysqli
     }
 
 }
-$obj = new Db;
-$result = $obj->select("SELECT * FROM user");
-var_dump($result);
