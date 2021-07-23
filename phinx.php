@@ -11,7 +11,7 @@ return
         'default_environment' => 'development',
         'production' => [
             'adapter' => 'mysql',
-            'host' => 'localhost',
+            'host' => 'dfdfd',
             'name' => 'production_db',
             'user' => 'root',
             'pass' => '',
